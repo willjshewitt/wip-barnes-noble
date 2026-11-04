@@ -229,12 +229,8 @@ h1 {
 #map .pin { pointer-events: none; }
 #map .labels { transition: opacity .4s ease-out; }
 #map.flying .labels { opacity: 0; transition-duration: .15s; }
-#map .cluster { cursor: pointer; animation: cluster-in .3s ease-out both; transition: opacity .3s ease-out; }
-#map .cluster.out { opacity: 0; pointer-events: none; }
-@keyframes cluster-in { from { opacity: 0; } }
-#map .store { transition: opacity .3s ease-out; }
+#map .cluster { cursor: pointer; }
 #map .store.grouped { opacity: 0; pointer-events: none; }
-@media (prefers-reduced-motion: reduce) { #map .cluster, #map .store { animation: none; transition: none; } }
 #map .cluster circle { fill: var(--blue); stroke: var(--paper); stroke-width: 1.5; transition: fill .2s; }
 #map .cluster:hover circle, #map .cluster:focus-visible circle { fill: var(--blue-ink); }
 #map .cluster:focus { outline: none; }

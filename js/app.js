@@ -62,7 +62,8 @@
 
   // Group stores that sit close together on screen into one counted circle.
   // Recomputed as you zoom, so groups split apart as you get closer.
-  var CLUSTER_PX = 34; // grouping radius on screen, in px
+  var CLUSTER_PX = 24; // group only nearby dots in the wider views
+  var CLUSTER_MAX_K = 4; // local views always show individual locations
   var MAXK = 60;
   // Groups only change at fixed zoom steps (every half doubling), not on every frame,
   // so circles hold still while you zoom and split cleanly as you pass each step
@@ -74,7 +75,7 @@
     var r = CLUSTER_PX / kq, cells = {}, groups = [], taken = {};
     // A group you've clicked stays open (its stores shown one by one) until you zoom back out
     if (openK && k < openK * 0.8) { openIds = {}; openK = 0; }
-    var pts = mapped.filter(function (s) { return !resultIds[s.id] && !openIds[s.id]; });
+    var pts = k < CLUSTER_MAX_K ? mapped.filter(function (s) { return !resultIds[s.id] && !openIds[s.id]; }) : [];
     pts.forEach(function (s) {
       var key = Math.floor(s.x / r) + ',' + Math.floor(s.y / r);
       (cells[key] = cells[key] || []).push(s);
@@ -99,7 +100,7 @@
     });
     // Merge groups whose circles would overlap, so the map reads as a few clear clusters
     var f0 = Math.max(0.7, Math.min(1, W / 900));
-    function rad(gp) { return (5 + 2.3 * Math.sqrt(gp.n)) * f0 / kq; }
+    function rad(gp) { return Math.min(16, 8 + 1.2 * Math.sqrt(gp.n)) * f0 / kq; }
     for (var pass = 0; pass < 4; pass++) {
       var merged = false;
       for (var a = 0; a < groups.length; a++) for (var b = a + 1; b < groups.length; b++) {
@@ -115,26 +116,21 @@
       groups = groups.filter(Boolean);
       if (!merged) break;
     }
-    // Cross-fade, never blink: groups that stay the same don't move; new ones fade in while
-    // the ones they replace fade out underneath, and single dots fade rather than pop
+    // Swap groups and dots in one frame: no fade, blank frame or lingering badges.
     dots.classed('grouped', function (d) { return !!taken[d.id]; });
     dots.attr('tabindex', function (d) { return taken[d.id] ? -1 : 0; });
-    var c = clusterLayer.selectAll('g.cluster:not(.out)').data(groups, function (d) { return d.id + ':' + d.members.length; })
+    var c = clusterLayer.selectAll('g.cluster').data(groups, function (d) { return d.members.map(function (s) { return s.id; }).join(','); })
       .join(function (enter) {
         var e = enter.append('g').attr('class', 'cluster').attr('tabindex', 0).attr('role', 'button');
         e.append('circle');
         e.append('text').attr('dy', '0.35em');
         return e;
-      }, null, function (exit) {
-        exit.classed('out', true).attr('tabindex', -1).lower();
-        setTimeout(function () { exit.remove(); }, 320);
       });
     c.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ') scale(' + 1 / k + ')'; })
       .attr('aria-label', function (d) { return d.n + ' stores around ' + d.members[0].c + ', ' + d.members[0].s; });
     var f = Math.max(0.7, Math.min(1, W / 900));
-    c.select('circle').attr('r', function (d) { return (5 + 2.3 * Math.sqrt(d.n)) * f; });
-    c.select('text').text(function (d) { return d.n; })
-      .style('font-size', function (d) { return Math.max(10, (5 + 2.3 * Math.sqrt(d.n)) * f * 0.62) + 'px'; });
+    c.select('circle').attr('r', function (d) { return Math.min(16, 8 + 1.2 * Math.sqrt(d.n)) * f; });
+    c.select('text').text(function (d) { return d.n; });
   }
   var clusterQueued = false;
   function queueCluster() {
@@ -373,8 +369,8 @@
 
   function on(sel, ev, fn) { var el = $(sel); if (el) el.addEventListener(ev, fn); }
   // A small step, so circles stay put (no fade) and regroup when it lands
-  on('#zin', 'click', function () { settling = true; svg.transition().duration(350).call(zoom.scaleBy, 2); });
-  on('#zout', 'click', function () { settling = true; svg.transition().duration(350).call(zoom.scaleBy, 0.5); });
+  on('#zin', 'click', function () { settling = true; svg.transition().duration(reduceMotion() ? 0 : 250).call(zoom.scaleBy, 2); });
+  on('#zout', 'click', function () { settling = true; svg.transition().duration(reduceMotion() ? 0 : 250).call(zoom.scaleBy, 0.5); });
   on('#zreset', 'click', function () { setPressed(null); lastView = null; resetZoom(); });
 
   // Tooltip
@@ -421,7 +417,7 @@
       encodeURIComponent('Barnes & Noble, ' + s.a + ', ' + s.c + ', ' + s.s + ' ' + s.z);
   }
   function fmtMiles(d) { return d < 1 ? '< 1 mi' : d < 10 ? d.toFixed(1) + ' mi' : Math.round(d) + ' mi'; }
-  function renderResults(list) {
+  function renderResults(list, keepView) {
     resultsEl.innerHTML = '';
     list.forEach(function (r, i) {
       var s = r.s;
@@ -438,11 +434,11 @@
     var ids = {};
     list.forEach(function (r) { ids[r.s.id] = true; });
     resultIds = ids;
-    openIds = {}; openK = 0;
+    if (!keepView) { openIds = {}; openK = 0; }
     // Results always mean zooming in: step the headline back now, together with the
     // results row appearing, so the map's box only changes once
     if (list.length) document.body.classList.add('zoomed');
-    cluster();
+    if (!keepView) cluster();
     dots.classed('near', function (d) { return !!ids[d.id]; }).classed('active', false);
     drawLabels(list);
     emit('wip:results', list);
@@ -461,19 +457,19 @@
   resultsEl.addEventListener('mouseleave', function () { hotPin(-1); hideTip(); });
 
   function selectStore(s, fromMap) {
+    if (fromMap) lastView = null;
+    if (fromMap && !document.querySelector('.result[data-id="' + s.id + '"]')) {
+      var list = nearest(s, 6);
+      renderResults(list, true);
+      statusEl.textContent = 'Stores near ' + s.c + ', ' + s.s + '.';
+    }
     dots.classed('active', function (d) { return d.id === s.id; });
     document.querySelectorAll('.result').forEach(function (b) {
       b.setAttribute('aria-current', +b.dataset.id === s.id ? 'true' : 'false');
     });
-    if (fromMap && !document.querySelector('.result[data-id="' + s.id + '"]')) {
-      var list = nearest(s, 6);
-      renderResults(list);
-      statusEl.textContent = 'Stores near ' + s.c + ', ' + s.s + '.';
-      dots.classed('active', function (d) { return d.id === s.id; });
-    }
     if (s.x != null) {
-      if (k < 6) zoomTo([[s.x, s.y]], { minSpan: 40 });
-      setTimeout(function () { showTip(s); }, reduceMotion() ? 0 : 780);
+      if (!fromMap && k < 6) zoomTo([[s.x, s.y]], { minSpan: 40 });
+      setTimeout(function () { showTip(s); }, fromMap || reduceMotion() ? 0 : 780);
     }
   }
 
