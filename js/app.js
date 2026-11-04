@@ -213,18 +213,16 @@
   };
   function emit(name, detail) { document.dispatchEvent(new CustomEvent(name, { detail: detail })); }
 
-  // Numbered pins for the current result list, matching the list numbers
+  // Pins for the current results: a dark dot each, with the town named once
   function drawLabels(list) {
     var data = list.length <= 12 ? list.filter(function (r) { return r.s.x != null; }) : [];
     var pin = labelLayer.selectAll('g').data(data, function (r) { return r.s.id; })
       .join(function (enter) {
         var e = enter.append('g').attr('class', 'pin');
-        e.append('circle').attr('r', 8);
-        e.append('text').attr('class', 'n').attr('dy', '0.35em');
-        e.append('text').attr('class', 'place').attr('x', 13).attr('dy', '0.35em');
+        e.append('circle').attr('r', 5.5);
+        e.append('text').attr('class', 'place').attr('x', 11).attr('dy', '0.35em');
         return e;
       });
-    pin.select('text.n').text(function (r, i) { return i + 1; });
     // Name each town once, beside its first pin
     var named = {};
     pin.select('text.place').text(function (r) {
@@ -249,7 +247,7 @@
       var name = label.text();
       if (!name) return;
       var x = r.s.x * k, y = r.s.y * k;
-      var box = [x - 9, y - 10, x + 16 + name.length * 7.2, y + 10];
+      var box = [x - 7, y - 10, x + 14 + name.length * 7.2, y + 10];
       var hit = placed.some(function (b) { return box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]; });
       label.attr('visibility', hit ? 'hidden' : null);
       if (!hit) placed.push(box);
@@ -380,13 +378,12 @@
   function fmtMiles(d) { return d < 1 ? '< 1 mi' : d < 10 ? d.toFixed(1) + ' mi' : Math.round(d) + ' mi'; }
   function renderResults(list) {
     resultsEl.innerHTML = '';
-    var numbered = list.length <= 12;
     list.forEach(function (r, i) {
       var s = r.s;
       var li = document.createElement('li');
       li.innerHTML =
         '<button type="button" class="result" data-id="' + s.id + '">' +
-          '<span class="city">' + (numbered ? '<i class="num">' + (i + 1) + '</i>' : '') + esc(s.c) + ', ' + s.s + '</span>' +
+          '<span class="city">' + esc(s.c) + ', ' + s.s + '</span>' +
           (r.d != null ? '<span class="dist">' + fmtMiles(r.d) + '</span>' : '<span></span>') +
           '<span class="addr">' + esc(s.a) + ' ' + s.z + '</span>' +
         '</button>' +
@@ -409,11 +406,13 @@
     if (!b) return;
     selectStore(stores[+b.dataset.id], false);
   });
+  // Pointing at a result lifts its pin on the map, so list and map match up without numbers
+  function hotPin(id) { labelLayer.selectAll('g.pin').classed('hot', function (r) { return r.s.id === id; }).filter('.hot').raise(); }
   resultsEl.addEventListener('mouseover', function (e) {
     var b = e.target.closest('.result');
-    if (b) { var s = stores[+b.dataset.id]; if (s.x != null) showTip(s); }
+    if (b) { var s = stores[+b.dataset.id]; hotPin(s.id); if (s.x != null) showTip(s); }
   });
-  resultsEl.addEventListener('mouseleave', hideTip);
+  resultsEl.addEventListener('mouseleave', function () { hotPin(-1); hideTip(); });
 
   function selectStore(s, fromMap) {
     dots.classed('active', function (d) { return d.id === s.id; });

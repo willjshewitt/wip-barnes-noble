@@ -9,6 +9,11 @@
 @font-face { font-family: 'GT Alpina'; src: url('../fonts/gt-alpina/GT-Alpina-Standard-Regular-Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: 'GT Alpina'; src: url('../fonts/gt-alpina/GT-Alpina-Standard-Light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
 @font-face { font-family: 'GT Alpina'; src: url('../fonts/gt-alpina/GT-Alpina-Standard-Light-Italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
+/* GT Alpina Condensed: titles, standfirsts and lists, as in the magazine */
+@font-face { font-family: 'GT Alpina Condensed'; src: url('../fonts/gt-alpina/GT-Alpina-Condensed-Light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GT Alpina Condensed'; src: url('../fonts/gt-alpina/GT-Alpina-Condensed-Light-Italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
+@font-face { font-family: 'GT Alpina Condensed'; src: url('../fonts/gt-alpina/GT-Alpina-Condensed-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GT Alpina Condensed'; src: url('../fonts/gt-alpina/GT-Alpina-Condensed-Regular-Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
 
 :root {
   --star-img: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%22665.3333 310.9072 57 57%22%3E%3Cpath d=%22M693.83331 365.90723 C693.83331 352.65723 707.08331 339.40723 720.33331 339.40723 C707.08331 339.40723 693.83331 326.15723 693.83331 312.90723 C693.83331 326.15723 680.58331 339.40723 667.33331 339.40723 C680.58331 339.40723 693.83331 352.65723 693.83331 365.90723%22/%3E%3C/svg%3E");
@@ -211,20 +216,19 @@ h1 {
 #map .store:focus { outline: none; }
 #map .store:focus-visible { stroke: var(--ink); stroke-width: 2.5; }
 #map .store.active { fill: var(--ink); stroke: var(--red); stroke-width: 2; }
-#map .pin circle { fill: var(--ink); stroke: var(--white); stroke-width: 1.2; }
+#map .pin circle {
+  fill: var(--ink); stroke: var(--paper); stroke-width: 1.5;
+  transform-box: fill-box; transform-origin: center; transition: transform .25s cubic-bezier(.2, .9, .3, 1.3), fill .2s;
+}
+#map .pin.hot circle { transform: scale(1.45); fill: var(--red); }
+#map .pin.hot text.place { fill: var(--red-ink); }
 #map .pin text.place {
   fill: var(--ink); text-anchor: start; font: 400 15px var(--f-cond);
   paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round;
 }
-#map .pin text.n { fill: var(--white); font: 400 11px var(--f-body); font-variant-numeric: lining-nums; text-anchor: middle; pointer-events: none; }
 #map .pin { pointer-events: none; }
 #map .clusters, #map .labels { transition: opacity .4s ease-out; }
 #map.flying .clusters, #map.flying .labels { opacity: 0; transition-duration: .15s; }
-.result .num {
-  display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 8px;
-  border-radius: 50%; background: var(--ink); color: var(--white);
-  font: normal 400 12px/1 var(--f-body); font-variant-numeric: lining-nums; vertical-align: 3px;
-}
 #map .cluster { cursor: pointer; animation: cluster-in .35s ease-out both; }
 @keyframes cluster-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { #map .cluster { animation: none; } }

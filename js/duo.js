@@ -8,10 +8,31 @@
     duo.dataset.focus = which;
     cards.forEach(function (c) { c.setAttribute('aria-expanded', String(c.dataset.show === which)); });
   }
+  // Which card the pointer means. The resting pair overlaps, so going by whichever is on
+  // top makes them flip back and forth as they move; instead, the half you're on decides.
+  // The area is both cards' boxes plus a margin, so a card leaning out never drops you.
+  function setLean(v) { if (v) duo.dataset.lean = v; else delete duo.dataset.lean; }
+  duo.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return;
+    if (duo.dataset.focus === 'none') {
+      var a = cards[0].getBoundingClientRect(), b = cards[1].getBoundingClientRect(), m = 24;
+      var inside = e.clientX > Math.min(a.left, b.left) - m && e.clientX < Math.max(a.right, b.right) + m &&
+                   e.clientY > Math.min(a.top, b.top) - m && e.clientY < Math.max(a.bottom, b.bottom) + m;
+      var mid = duo.getBoundingClientRect().left + duo.clientWidth / 2;
+      setLean(inside ? (e.clientX < mid ? 'issue' : 'tote') : null);
+    } else {
+      var c = e.target.closest('.card');
+      setLean(c ? c.dataset.show : null);
+    }
+  });
+  duo.addEventListener('pointerleave', function () { setLean(null); });
+
   cards.forEach(function (c) {
-    c.addEventListener('click', function () {
+    c.addEventListener('click', function (e) {
+      // With a mouse at rest, pick the one leaning out (even if the other is on top there)
+      var which = duo.dataset.focus === 'none' && e.detail && duo.dataset.lean ? duo.dataset.lean : c.dataset.show;
       // Picking the open one again puts the pair back together
-      show(duo.dataset.focus === c.dataset.show ? 'none' : c.dataset.show);
+      show(duo.dataset.focus === which ? 'none' : which);
     });
   });
   document.addEventListener('keydown', function (e) {

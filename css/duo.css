@@ -35,14 +35,24 @@
   transition: opacity .4s;
 }
 .card-hint i { font-style: normal; letter-spacing: 0; display: inline-block; transition: transform .3s; }
-.card:hover .card-hint i { transform: translateX(var(--nudge, 4px)); }
-.card-tote .card-hint { --nudge: -4px; }
+.card-cover .card-hint { --nudge: -4px; }
+.card-tote .card-hint { --nudge: 4px; }
+.duo[data-lean="issue"] .card-cover .card-hint i,
+.duo[data-lean="tote"] .card-tote .card-hint i,
+.card:focus-visible .card-hint i { transform: translateX(var(--nudge)); }
 
 /* Resting: a loose pair, fanned apart */
 .duo[data-focus="none"] .card-cover { --x: calc(var(--spread) * -1); --r: -5deg; }
 .duo[data-focus="none"] .card-tote  { --x: var(--spread); --r: 5deg; }
-.duo[data-focus="none"] .card-cover:hover { --hr: -3deg; --x: calc(var(--spread) * -1 - 14px); z-index: 2; }
-.duo[data-focus="none"] .card-tote:hover  { --hr: 3deg;  --x: calc(var(--spread) + 14px); z-index: 2; }
+/* Leaning: which one you mean is decided by which half the pointer is on (set in duo.js),
+   not by :hover. The cards overlap, so :hover would flip between them as they move. */
+.duo[data-focus="none"] .card { transition-duration: .7s, .5s; }
+.duo[data-lean="issue"] .card-cover,
+.duo[data-focus="none"] .card-cover:focus-visible { --hr: -2.5deg; --x: calc(var(--spread) * -1 - 18px); --y: -6px; --s: 1.015; z-index: 2; }
+.duo[data-lean="tote"] .card-tote,
+.duo[data-focus="none"] .card-tote:focus-visible  { --hr: 2.5deg;  --x: calc(var(--spread) + 18px); --y: -6px; --s: 1.015; z-index: 2; }
+.duo[data-lean="issue"] .card-tote  { --s: .985; opacity: .92; }
+.duo[data-lean="tote"] .card-cover  { --s: .985; opacity: .92; }
 
 /* Cover picked: it swings left, the photo slips to the right edge */
 .duo[data-focus="issue"] .card-cover { --x: calc(min(25vw, 340px) * -1); --r: -2deg; --s: 1.02; z-index: 2; }
@@ -51,8 +61,8 @@
 .duo[data-focus="tote"] .card-tote   { --x: min(25vw, 340px); --r: 2deg; --s: 1.02; z-index: 2; }
 .duo[data-focus="tote"] .card-cover  { --x: max(calc(-50vw + 30px), -780px); --r: -13deg; --s: .78; opacity: .55; }
 .duo:not([data-focus="none"]) .card-hint { opacity: 0; }
-.duo[data-focus="issue"] .card-tote:hover  { --s: .82; --hr: -3deg; opacity: .85; }
-.duo[data-focus="tote"] .card-cover:hover  { --s: .82; --hr: 3deg; opacity: .85; }
+.duo[data-focus="issue"][data-lean="tote"] .card-tote  { --s: .81; --hr: -3deg; opacity: .85; }
+.duo[data-focus="tote"][data-lean="issue"] .card-cover { --s: .81; --hr: 3deg; opacity: .85; }
 
 /* Arriving on this screen: the pair is dealt in from below */
 .duo-page:not(.at-issue) .card-cover { --y: 30dvh; --r: -16deg; opacity: 0; }
@@ -60,7 +70,7 @@
 .duo-page.at-issue .card { transition-delay: .3s; }
 .duo-page.at-issue .card-tote { transition-delay: .42s; }
 .duo-page.at-issue .duo:not([data-focus="none"]) .card,
-.duo-page.at-issue .duo .card:hover { transition-delay: 0s; }
+.duo-page.at-issue .duo[data-lean] .card { transition-delay: 0s; }
 
 /* The badge only turns up when the photo is picked */
 .card-tote .badge {
