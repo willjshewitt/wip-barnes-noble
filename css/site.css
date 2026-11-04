@@ -227,11 +227,14 @@ h1 {
   paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round;
 }
 #map .pin { pointer-events: none; }
-#map .clusters, #map .labels { transition: opacity .4s ease-out; }
-#map.flying .clusters, #map.flying .labels { opacity: 0; transition-duration: .15s; }
-#map .cluster { cursor: pointer; animation: cluster-in .35s ease-out both; }
+#map .labels { transition: opacity .4s ease-out; }
+#map.flying .labels { opacity: 0; transition-duration: .15s; }
+#map .cluster { cursor: pointer; animation: cluster-in .3s ease-out both; transition: opacity .3s ease-out; }
+#map .cluster.out { opacity: 0; pointer-events: none; }
 @keyframes cluster-in { from { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { #map .cluster { animation: none; } }
+#map .store { transition: opacity .3s ease-out; }
+#map .store.grouped { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #map .cluster, #map .store { animation: none; transition: none; } }
 #map .cluster circle { fill: var(--blue); stroke: var(--paper); stroke-width: 1.5; transition: fill .2s; }
 #map .cluster:hover circle, #map .cluster:focus-visible circle { fill: var(--blue-ink); }
 #map .cluster:focus { outline: none; }

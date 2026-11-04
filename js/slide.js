@@ -115,7 +115,7 @@
     start = null;
     track.classList.remove('dragging');
     if (!moved) return;
-    var flick = stage.clientWidth * 0.18;
+    var flick = stage.clientWidth * 0.1;
     if (!listing() && dx < -flick) go('list');
     else if (listing() && dx > flick) go('map');
     else track.style.transform = '';
@@ -124,15 +124,21 @@
   stage.addEventListener('pointercancel', endDrag);
 
   // Two-finger sideways swipe on a trackpad
-  var wheelX = 0, wheelTimer;
+  var wheelX = 0, wheelTimer, swipeLock = false;
   stage.addEventListener('wheel', function (e) {
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-    if (e.target.closest('.map-frame')) return; // sideways on the map pans it
+    // Sideways on a zoomed-in map pans it; on the whole map it flips to the list
+    if (e.target.closest('.map-frame') && map.transform().k > 1.01) return;
     wheelX += e.deltaX;
     clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(function () { wheelX = 0; }, 180);
-    if (wheelX > 90 && !listing()) { wheelX = 0; go('list'); }
-    else if (wheelX < -90 && listing()) { wheelX = 0; go('map'); }
+    wheelTimer = setTimeout(function () { wheelX = 0; }, 260);
+    if (swipeLock) return;
+    // A light sideways swipe is enough; then ignore the rest of that fling
+    if ((wheelX > 36 && !listing()) || (wheelX < -36 && listing())) {
+      go(listing() ? 'map' : 'list');
+      wheelX = 0; swipeLock = true;
+      setTimeout(function () { swipeLock = false; }, 900);
+    }
   }, { passive: true });
 
   // Pick a store: swipe back and show it on the map
