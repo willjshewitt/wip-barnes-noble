@@ -1,0 +1,119 @@
+/* A second screen below the first. Scroll, swipe or press the tab and the whole
+   page slides up to Issue 26; the same move in reverse brings the map back. */
+body.slide { display: block; }
+.vstack { height: 200dvh; transition: transform .9s cubic-bezier(.7, 0, .15, 1); will-change: transform; }
+.vstack.dragging { transition: none; }
+.at-issue .vstack { transform: translateY(-100dvh); }
+.screen { height: 100dvh; }
+.screen-main { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.slide #map { -webkit-mask-image: none; mask-image: none; }
+
+/* The divider breaks for the tab that sits in its middle */
+.rule.split::before {
+  height: 1px; top: calc(50% - .5px); background-color: transparent; opacity: .85;
+  background:
+    linear-gradient(currentColor, currentColor) left center / calc(50% - 120px) 100% no-repeat,
+    linear-gradient(currentColor, currentColor) right center / calc(50% - 120px) 100% no-repeat;
+}
+.vstack { position: relative; }
+.seam-space { height: 64px; }
+
+/* The shared divider: 32px above the seam on the map screen, 32px below it on the issue screen */
+.seam {
+  position: absolute; left: 0; right: 0; top: 100dvh; z-index: 6;
+  max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter);
+  transform: translateY(-32px);
+  transition: transform .9s cubic-bezier(.7, 0, .15, 1);
+  pointer-events: none;
+}
+.at-issue .seam { transform: translateY(32px); }
+.vstack.dragging .seam { transition: none; }
+.v-tab {
+  position: absolute; left: 50%; top: 4.5px; transform: translate(-50%, -50%);
+  width: 240px; height: 30px; overflow: hidden; pointer-events: auto;
+  border: 0; background: transparent; cursor: pointer; padding: 0;
+  font: 400 13px var(--f-type); letter-spacing: .16em; text-transform: uppercase; color: var(--red-ink);
+  white-space: nowrap;
+}
+.v-tab .lbl {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: .5em;
+  transition: transform .7s cubic-bezier(.7, 0, .15, 1), opacity .45s;
+}
+.v-tab .lbl-up { transform: translateY(100%); opacity: 0; }
+.at-issue .v-tab .lbl-down { transform: translateY(-100%); opacity: 0; }
+.at-issue .v-tab .lbl-up { transform: none; opacity: 1; }
+.v-tab i { font-style: normal; letter-spacing: 0; display: inline-block; transition: transform .3s; }
+.v-tab:hover .lbl-down i { transform: translateY(3px); }
+.v-tab:hover .lbl-up i { transform: translateY(-3px); }
+
+/* Issue screen */
+.screen-issue {
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  max-width: var(--max); margin: 0 auto; padding: clamp(18px, 3vh, 30px) var(--gutter) 0;
+}
+.issue-body {
+  min-height: 0;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center;
+  gap: clamp(32px, 6vw, 96px); padding: clamp(20px, 4vh, 48px) clamp(0px, 4vw, 64px);
+}
+.issue-cover { margin: 0; height: 100%; max-height: min(78dvh, 820px); display: flex; align-items: center; }
+.issue-cover img {
+  height: auto; width: auto; max-height: 100%; max-width: 42vw;
+  box-shadow: 0 1px 2px rgba(35,31,32,.12), 0 30px 60px -24px rgba(35,31,32,.45);
+  transform: translateY(40px) rotate(-1.5deg); opacity: 0;
+  transition: transform 1.1s cubic-bezier(.2, .8, .2, 1) .35s, opacity .8s .35s;
+}
+.at-issue .issue-cover img { transform: none; opacity: 1; }
+.issue-text { max-width: 520px; }
+.issue-text > * { opacity: 0; transform: translateY(16px); transition: opacity .7s, transform .9s cubic-bezier(.2, .8, .2, 1); }
+.at-issue .issue-text > * { opacity: 1; transform: none; }
+.at-issue .issue-text > :nth-child(1) { transition-delay: .5s; }
+.at-issue .issue-text > :nth-child(2) { transition-delay: .58s; }
+.at-issue .issue-text > :nth-child(3) { transition-delay: .66s; }
+.at-issue .issue-text > :nth-child(4) { transition-delay: .74s; }
+.at-issue .issue-text > :nth-child(5) { transition-delay: .82s; }
+.issue-text .tag { color: var(--red-ink); margin-bottom: 14px; }
+.issue-text h2 { font: 400 clamp(44px, min(5.6vw, 9vh), 88px)/.95 var(--f-title); color: var(--red); margin: 0 0 clamp(16px, 3vh, 28px); }
+.contents { list-style: none; margin: 0 0 clamp(16px, 3vh, 28px); padding: 0; }
+.contents li {
+  font: 300 clamp(19px, min(1.7vw, 2.9vh), 26px)/1.25 var(--f-cond);
+  padding: clamp(3px, .6vh, 6px) 0; border-bottom: 0.75px solid var(--hair);
+}
+.contents li:last-child { border-bottom: 0; }
+/* Hover: a small red star slides in just before the title */
+.contents li { position: relative; }
+.contents li::before {
+  content: ''; position: absolute; top: 50%; left: var(--tx, 0px); width: 10px; height: 10px; margin-top: -5px;
+  background: var(--red); pointer-events: none;
+  -webkit-mask: var(--star-img) center / contain no-repeat; mask: var(--star-img) center / contain no-repeat;
+  opacity: 0; transform: translateX(-100%) scale(.4);
+  transition: opacity .25s, transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+.contents li:hover::before { opacity: 1; transform: translateX(calc(-100% - 10px)) rotate(90deg) scale(1); }
+.contents li:hover { color: var(--red-ink); }
+.contents a { color: inherit; text-decoration: none; transition: color .2s; }
+.contents a:hover, .contents a:focus-visible { color: var(--red-ink); text-decoration: underline; text-decoration-thickness: .5px; text-underline-offset: 4px; outline: none; }
+.pitch { font-size: 17px; line-height: 1.45; margin: 0 0 20px; color: var(--muted); max-width: 44ch; }
+.issue-text .button { color: var(--red-ink); }
+.issue-text .button:hover { background: var(--red); border-color: var(--red); color: var(--white); }
+
+@media (max-width: 860px) {
+  .issue-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 16px; padding: 18px 0 16px; align-items: start; }
+  .issue-cover { justify-content: center; max-height: none; min-height: 0; }
+  .issue-cover { height: 100%; align-items: center; }
+  .issue-cover img { max-width: 76vw; }
+  .contents { display: none; }
+  .issue-text { text-align: center; max-width: none; }
+  .issue-text h2 { font-size: 40px; margin-bottom: 10px; }
+  .pitch { margin: 0 auto 14px; font-size: 15px; }
+  .rule.split::before {
+    background:
+      linear-gradient(currentColor, currentColor) left center / calc(50% - 100px) 100% no-repeat,
+      linear-gradient(currentColor, currentColor) right center / calc(50% - 100px) 100% no-repeat;
+  }
+  .v-tab { font-size: 11px; width: 200px; }
+  .edge-tab { bottom: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vstack, .issue-cover img, .issue-text > * { transition: none; }
+}

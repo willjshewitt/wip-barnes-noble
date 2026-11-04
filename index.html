@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Now at Barnes &amp; Noble — Works in Progress</title>
+<meta name="description" content="Works in Progress is now on sale in 570 Barnes & Noble stores across 49 states, from Hawaii to Maine. Find your nearest store.">
+<meta property="og:title" content="Works in Progress is now at Barnes & Noble">
+<meta property="og:description" content="570 stores. 49 states. From Hawaii to Maine.">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="share/wip-bn-map-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="share/wip-bn-map-1200x630.png">
+<link rel="icon" href="img/star.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/minimal.css">
+<link rel="stylesheet" href="css/slide.css">
+<link rel="stylesheet" href="css/issue.css">
+<link rel="stylesheet" href="css/duo.css">
+</head>
+<body class="minimal slide duo-page">
+
+<div class="vstack">
+<div class="screen screen-main">
+<header class="masthead">
+  <a href="https://worksinprogress.co" aria-label="Works in Progress home"><img src="img/wip-masthead.svg" alt="Works in Progress" width="300" height="58"></a>
+  <div class="rule" aria-hidden="true"></div>
+</header>
+
+<div class="stage">
+  <div class="track">
+
+    <main class="pane pane-map">
+      <section class="lead">
+        <h1>Now at Barnes&nbsp;&amp;&nbsp;Noble</h1>
+        <p class="standfirst"><span data-count="stores">570</span> stores. <span class="wy" tabindex="0">49 states<sup aria-hidden="true">*</sup><span class="wy-tip" role="tooltip">Sorry Wyoming!</span></span>. From Hawaii to Maine.</p>
+        <form id="search" class="search" role="search">
+          <label for="q" class="sr-only">Zip code or city</label>
+          <input id="q" name="q" type="search" placeholder="Enter a zip code or city" autocomplete="postal-code" enterkeyhint="search">
+          <button type="submit">Find a store</button>
+        </form>
+        <p class="aside"><button type="button" id="locate" class="link">Use my location</button>
+          <button type="button" class="link map-all" data-go="list" aria-controls="stockists">See all <span data-count="stores">570</span> stockists <i aria-hidden="true">→</i></button>
+          <button type="button" id="zreset" class="link" data-auto="1" hidden>Show all stores</button></p>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <figure class="map-fig">
+        <div class="map-frame">
+          <svg id="map" data-wheel="ctrl" role="img" aria-label="Map of the United States showing Barnes &amp; Noble stores that stock Works in Progress"></svg>
+          <div id="tip" class="tip" hidden></div>
+          <div class="zoom-ctl" role="group" aria-label="Zoom">
+            <button type="button" id="zin" aria-label="Zoom in">+</button>
+            <button type="button" id="zout" aria-label="Zoom out">&minus;</button>
+          </div>
+        </div>
+      </figure>
+
+      <ol id="results" class="results"></ol>
+    </main>
+
+    <section class="pane pane-list" id="stockists" aria-labelledby="stockists-h" inert>
+      <div class="list-head">
+        <h2 id="stockists-h">Every stockist</h2>
+        <label class="sr-only" for="filter">Filter stores</label>
+        <input id="filter" class="filter" type="search" placeholder="Filter by city, state or zip" autocomplete="off">
+      </div>
+      <div id="stock-list" class="stock-list"></div>
+      <p id="stock-empty" class="status" hidden>No stores match that.</p>
+    </section>
+
+  </div>
+
+  <button type="button" class="edge-tab to-list" data-go="list" aria-controls="stockists">
+    <span class="edge-star" aria-hidden="true"></span>
+    <span class="edge-label">All <span data-count="stores">570</span> stockists</span>
+  </button>
+  <button type="button" class="edge-tab to-map" data-go="map" tabindex="-1">
+    <span class="edge-star" aria-hidden="true"></span>
+    <span class="edge-label">Back to the map</span>
+  </button>
+</div>
+
+<div class="seam-space" aria-hidden="true"></div>
+</div>
+
+<!-- One divider on the seam between the two screens. It travels with the page and its label swaps over. -->
+<div class="seam">
+  <div class="rule split" aria-hidden="true"></div>
+  <button type="button" class="v-tab seam-tab" aria-controls="issue">
+    <span class="lbl lbl-down">Inside Issue 26 <i aria-hidden="true">↓</i></span>
+    <span class="lbl lbl-up"><i aria-hidden="true">↑</i> Back to the map</span>
+  </button>
+</div>
+
+<section class="screen screen-issue" id="issue" aria-labelledby="issue-h" inert>
+  <div class="seam-space" aria-hidden="true"></div>
+  <div class="duo" data-focus="none">
+
+    <!-- The two pictures. Each is a button: it swings to its side and brings its story in. -->
+    <button type="button" class="card card-cover" data-show="issue" aria-controls="panel-issue" aria-expanded="false">
+      <img src="img/cover-i26.jpg" alt="The cover of Works in Progress Issue 26: a painted blue cormorant against a coral sky" width="600" height="771">
+      <span class="card-hint">Inside Issue 26 <i aria-hidden="true">→</i></span>
+    </button>
+
+    <button type="button" class="card card-tote" data-show="tote" aria-controls="panel-tote" aria-expanded="false">
+      <span class="print">
+        <img src="img/tote.jpg" alt="A reader smiling over her shoulder, carrying a blue Works in Progress tote bag" width="800" height="1200">
+        <span class="print-caption">Fancy a free tote?</span>
+      </span>
+      <svg class="badge" viewBox="0 0 100 100" aria-hidden="true">
+        <defs><path id="badge-ring" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs>
+        <circle cx="50" cy="50" r="49" class="badge-disc"/>
+        <g class="badge-ring"><text><textPath href="#badge-ring" textLength="230">Free tote ✦ Snap a copy ✦</textPath></text></g>
+        <path class="badge-star" d="M50 38 C50 45 55 50 62 50 C55 50 50 55 50 62 C50 55 45 50 38 50 C45 50 50 45 50 38Z"/>
+      </svg>
+      <span class="card-hint"><i aria-hidden="true">←</i> How to get one</span>
+    </button>
+
+    <!-- Shown when the cover is picked -->
+    <div class="panel panel-issue" id="panel-issue" aria-live="polite">
+      <p class="tag">Issue 26 — On sale now</p>
+      <h2 id="issue-h">Inside Issue&nbsp;26</h2>
+      <ul class="contents">
+        <li style="--i:0"><a href="https://worksinprogress.co/issue/the-seven-vices-of-highly-effective-victorians/" target="_blank" rel="noopener">Victorian Nightclubs</a></li>
+        <li style="--i:1">Weapons of Mass Decentralization</li>
+        <li style="--i:2">The Genius of Kamil Khan Mumtaz</li>
+        <li style="--i:3"><a href="https://worksinprogress.co/issue/mosquitoes-are-a-choice/" target="_blank" rel="noopener">Mosquito Eradication</a></li>
+        <li style="--i:4"><a href="https://worksinprogress.co/issue/the-forgotten-formula-for-lovable-cities/" target="_blank" rel="noopener">The Formula for Lovable Cities</a></li>
+        <li style="--i:5">General Managers for Public Goods</li>
+        <li style="--i:6"><a href="https://worksinprogress.co/issue/chinas-growth-machine/" target="_blank" rel="noopener">China's Growth Machines</a></li>
+        <li style="--i:7"><a href="https://worksinprogress.co/issue/everything-rhymes-with-porcelain/" target="_blank" rel="noopener">Porcelain</a></li>
+      </ul>
+      <a class="button" href="https://worksinprogress.co/subscribe">Subscribe</a>
+    </div>
+
+    <!-- Shown when the tote photo is picked -->
+    <div class="panel panel-tote" id="panel-tote" aria-live="polite">
+      <p class="tag">Free, while they last</p>
+      <h2>Snap a copy, get a&nbsp;tote</h2>
+      <ol class="steps">
+        <li style="--i:0"><b>1</b>Buy Issue 26 at any Barnes &amp; Noble.</li>
+        <li style="--i:1"><b>2</b>Take a photo with it outside the store.</li>
+        <li style="--i:2"><b>3</b>Tag us or email it in. We'll post you a tote, on&nbsp;us.</li>
+      </ol>
+      <p class="how"><a href="https://x.com/WorksInProgMag">@WorksInProgMag</a><a href="mailto:hello@worksinprogress.co?subject=My%20Barnes%20%26%20Noble%20photo">hello@worksinprogress.co</a></p>
+    </div>
+  </div>
+</section>
+</div>
+
+<script src="js/d3.min.js"></script>
+<script src="js/topojson-client.min.js"></script>
+<script src="data/us.js"></script>
+<script src="data/stores.js"></script>
+<script src="js/app.js"></script>
+<script src="js/slide.js"></script>
+<script src="js/issue.js"></script>
+<script src="js/duo.js"></script>
+</body>
+</html>
