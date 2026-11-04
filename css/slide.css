@@ -34,6 +34,14 @@ body.slide {
 .slide .status { margin-top: 6px; min-height: 1.3em; }
 .slide .map-fig { flex: 1 1 auto; min-height: 0; display: flex; margin-top: clamp(4px, 1vh, 12px); }
 .slide .map-frame { flex: 1; aspect-ratio: auto; min-height: 0; }
+/* Soft edges: the map fades into the paper instead of stopping at a hard line.
+   A paper-coloured wash over the edges (cheaper than masking the SVG while zooming). */
+.slide .map-frame::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(to bottom, var(--paper), rgba(248, 248, 244, 0) 9%, rgba(248, 248, 244, 0) 88%, var(--paper)),
+    linear-gradient(to right, var(--paper), rgba(248, 248, 244, 0) 7%, rgba(248, 248, 244, 0) 93%, var(--paper));
+}
 
 /* Zoomed in: the headline steps back and the search tightens, giving the map the room */
 .slide h1, .slide .standfirst, .slide .search, .slide .search input {
