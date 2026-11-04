@@ -2,6 +2,7 @@
 (function () {
   'use strict';
   var body = document.body;
+  if (body.classList.contains('duo-page') && matchMedia('(max-width: 860px), (max-width: 1024px) and (max-height: 500px)').matches) body.classList.add('natural');
   var stack = document.querySelector('.vstack');
   var issue = document.getElementById('issue');
   var main = document.querySelector('.screen-main');
@@ -32,7 +33,7 @@
       if (down === at()) return;
       body.classList.toggle('at-issue', down);
       seamTab.setAttribute('aria-label', down ? 'Back to the map' : 'Inside Issue 26');
-    }, { threshold: 0.45 }).observe(issue);
+    }, { threshold: 0.1 }).observe(issue);
     seamTab.addEventListener('click', function () {
       (at() ? main : issue).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     });

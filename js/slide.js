@@ -65,7 +65,10 @@
     mapPane.inert = to;
     toList.tabIndex = to ? -1 : 0;
     toMap.tabIndex = to ? 0 : -1;
-    if (to) setTimeout(function () { filter.focus({ preventScroll: true }); }, 700);
+    if (to && !body.classList.contains('natural') && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      setTimeout(function () { if (listing()) filter.focus({ preventScroll: true }); }, 700);
+    }
+    if (body.classList.contains('natural')) stage.scrollIntoView({ block: 'start' });
   }
   toList.addEventListener('click', function () { go('list'); });
   document.querySelectorAll('.map-all').forEach(function (b) { b.addEventListener('click', function () { go('list'); }); });

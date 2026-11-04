@@ -186,6 +186,7 @@
     nationPath.attr('d', path(nationGeo));
   }
   function refit() {
+    if (!frame.clientWidth || !frame.clientHeight) return;
     // Remember what the reader is looking at, so a resize doesn't throw them back out
     // Mid-zoom, wait for the zoom to land first
     if (zooming) { refitAfterZoom = true; return; }
@@ -296,7 +297,8 @@
   // Scroll or pinch over the map to zoom (as on a Mac trackpad); a sideways swipe pans
   // On a page that scrolls normally (data-wheel="modifier"), a plain scroll moves the page:
   // pinch or hold ⌘/Ctrl to zoom, and on touch one finger scrolls while two move the map.
-  var modifierWheel = svg.attr('data-wheel') === 'modifier';
+  var modifierWheel = svg.attr('data-wheel') === 'modifier' ||
+    (document.body.classList.contains('duo-page') && matchMedia('(max-width: 860px), (max-width: 1024px) and (max-height: 500px)').matches);
   var hintEl = document.querySelector('.map-hint'), hintTimer;
   function hint(text) {
     if (!hintEl) return;
@@ -339,6 +341,7 @@
   var lastW = frame.clientWidth, lastH = frame.clientHeight;
   var refitQueued = false;
   new ResizeObserver(function () {
+    if (!frame.clientWidth || !frame.clientHeight) return;
     if (frame.clientWidth === lastW && frame.clientHeight === lastH) return;
     lastW = frame.clientWidth; lastH = frame.clientHeight;
     clearTimeout(refitQueued);
