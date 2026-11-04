@@ -364,7 +364,11 @@
     else svg.transition().duration(reduceMotion() ? 0 : 750).call(zoom.transform, t);
     return s;
   }
-  function resetZoom() { svg.transition().duration(reduceMotion() ? 0 : 600).call(zoom.transform, d3.zoomIdentity); }
+  function resetZoom() {
+    lastOrigin = null;
+    meLayer.selectAll('*').remove();
+    svg.transition().duration(reduceMotion() ? 0 : 600).call(zoom.transform, d3.zoomIdentity);
+  }
   function reduceMotion() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 
   function on(sel, ev, fn) { var el = $(sel); if (el) el.addEventListener(ev, fn); }
@@ -457,6 +461,8 @@
   resultsEl.addEventListener('mouseleave', function () { hotPin(-1); hideTip(); });
 
   function selectStore(s, fromMap) {
+    lastOrigin = null;
+    meLayer.selectAll('*').remove();
     if (fromMap) lastView = null;
     if (fromMap && !document.querySelector('.result[data-id="' + s.id + '"]')) {
       var list = nearest(s, 6);
@@ -473,16 +479,16 @@
     }
   }
 
-  function showNear(origin, label) {
+  function showNear(origin, label, showLocation) {
     var list = nearest(origin, 8);
     renderResults(list);
     var closest = list[0];
     statusEl.textContent = closest.d > 60
       ? 'The nearest store to ' + label + ' is ' + fmtMiles(closest.d) + ' away.'
       : 'The nearest stores to ' + label + '.';
-    lastOrigin = origin;
+    lastOrigin = showLocation ? origin : null;
     meLayer.selectAll('*').remove();
-    drawMe(origin);
+    if (lastOrigin) drawMe(lastOrigin);
     lastView = function (instant) {
       var pts = list.slice(0, 5).filter(function (r) { return r.s.x != null; }).map(function (r) { return [r.s.x, r.s.y]; });
       var p = projection([origin.lng, origin.lat]);
@@ -569,7 +575,7 @@
     if (!navigator.geolocation) { statusEl.textContent = "Your browser can't share your location. Try a zip code."; return; }
     statusEl.textContent = 'Finding you…';
     navigator.geolocation.getCurrentPosition(function (pos) {
-      showNear({ lat: pos.coords.latitude, lng: pos.coords.longitude }, 'you');
+      showNear({ lat: pos.coords.latitude, lng: pos.coords.longitude }, 'you', true);
     }, function () {
       statusEl.textContent = "We couldn't get your location. Try a zip code.";
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
