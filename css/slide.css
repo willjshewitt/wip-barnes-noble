@@ -74,23 +74,16 @@ body.slide {
 .list-head .filter:focus { outline: none; border-bottom-color: var(--red); }
 .list-head .filter::-webkit-search-cancel-button { -webkit-appearance: none; }
 .stock-list {
-  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-  columns: 4 220px; column-gap: calc(var(--u) * 4);
+  flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
   scrollbar-width: thin; scrollbar-color: var(--hair) transparent;
-  padding-bottom: 40px;
-  /* Soft edges, like the map: fade wherever there is more to scroll to */
-  --fl: 0px; --fr: 0px;
-  -webkit-mask-image:
-    linear-gradient(to right, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent),
-    linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to right, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent),
-    linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
-  mask-composite: intersect;
+  /* Soft edges, like the map: fade top and bottom only where there is more to scroll to */
+  --ft: 0px; --fb: 0px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--ft), #000 calc(100% - var(--fb)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--ft), #000 calc(100% - var(--fb)), transparent);
 }
-.stock-list.more-left { --fl: 90px; }
-.stock-list.more-right { --fr: 90px; }
+.stock-list.more-up { --ft: 56px; }
+.stock-list.more-down { --fb: 72px; }
+.stock-cols { columns: 4 220px; column-gap: calc(var(--u) * 4); padding-bottom: 40px; }
 .stock-state { break-inside: avoid; margin: 0 0 calc(var(--u) * 2.5); }
 .stock-state h3 {
   display: flex; justify-content: space-between; align-items: baseline;

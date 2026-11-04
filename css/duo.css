@@ -8,6 +8,36 @@
   width: 100vw; margin: 0 0 0 calc(50% - 50vw);
 }
 
+/* Bigger masthead, smaller headline */
+.duo-page .masthead img { width: clamp(255px, 24vw, 345px); }
+.duo-page h1 { font-size: clamp(30px, min(4.95vw, 7.1vh), 78px); }
+.duo-page.zoomed h1 { font-size: clamp(24px, min(2.3vw, 3.9vh), 34px); }
+@media (max-width: 860px) {
+  .duo-page .masthead img { width: clamp(220px, 60vw, 300px); }
+  .duo-page h1 { font-size: clamp(26px, 7.5vw, 36px); }
+  .duo-page .aside { flex-wrap: wrap; gap: 8px 18px; }
+  .duo-page .aside .link { white-space: nowrap; font-size: 11px; letter-spacing: .12em; }
+}
+
+/* Natural scrolling: the page simply scrolls from the map down to the issue */
+html:has(body.natural) { height: auto; }
+body.natural.slide { height: auto; overflow: visible; display: block; }
+.natural .vstack { height: auto; transform: none !important; transition: none; }
+.natural .seam { top: calc(100dvh - 34px); transform: none !important; transition: none; }
+/* The issue screen is a little shorter, so scrolling to the end leaves the divider in view at its top */
+.natural .screen-issue { height: calc(100dvh - 68px); }
+.natural .screen-issue .seam-space { height: 28px; }
+.natural #map { touch-action: pan-y; }
+@media (hover: none) { .natural .zoom-ctl { display: flex; } }
+.map-hint {
+  position: absolute; left: 50%; top: 50%; z-index: 4; margin: 0; pointer-events: none;
+  transform: translate(-50%, -50%) scale(.96); opacity: 0;
+  padding: 10px 18px; background: rgba(248, 248, 244, .94); border: 0.75px solid var(--hair);
+  font: italic 300 16px var(--f-body); color: var(--ink); white-space: nowrap;
+  transition: opacity .3s, transform .3s;
+}
+.map-hint.on { opacity: 1; transform: translate(-50%, -50%); }
+
 /* Cards */
 .card {
   --x: 0px; --y: 0px; --r: 0deg; --hr: 0deg; --s: 1;
@@ -102,6 +132,7 @@
 .panel > :nth-child(2) { transition-delay: .48s; }
 .panel > :nth-child(3) { transition-delay: .56s; }
 .panel > :nth-child(4) { transition-delay: .66s; }
+.panel > :nth-child(5) { transition-delay: .74s; }
 .panel .tag { color: var(--red-ink); margin-bottom: 12px; }
 .panel h2 { font: 400 clamp(40px, min(4.4vw, 8vh), 72px)/.95 var(--f-title); color: var(--red); margin: 0 0 clamp(14px, 2.6vh, 24px); }
 .panel-tote h2 { color: var(--blue); }
@@ -111,6 +142,7 @@
   padding: clamp(2px, .45vh, 5px) 0; border-bottom: 0.75px solid var(--hair);
 }
 .panel .contents li:last-child { border-bottom: 0; }
+.panel .columns { font: italic 300 clamp(15px, min(1.2vw, 2.2vh), 18px)/1.4 var(--f-body); color: var(--muted); margin: 0 0 clamp(14px, 2.6vh, 24px); }
 .panel .button { color: var(--red-ink); }
 .panel .button:hover { background: var(--red); border-color: var(--red); color: var(--white); }
 .steps { list-style: none; margin: 0 0 clamp(14px, 2.6vh, 24px); padding: 0; }

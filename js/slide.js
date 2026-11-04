@@ -18,7 +18,10 @@
     return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   }
 
-  // Build the list, grouped by state
+  // Build the list, grouped by state, in columns that read top to bottom and scroll down
+  var cols = document.createElement('div');
+  cols.className = 'stock-cols';
+  listEl.appendChild(cols);
   var groups = {};
   map.stores.forEach(function (s) { (groups[s.s] = groups[s.s] || []).push(s); });
   Object.keys(groups)
@@ -34,7 +37,7 @@
           return '<li data-key="' + esc(key) + '"><button type="button" data-id="' + s.id + '">' +
             esc(s.c) + '<span>' + esc(s.a) + '</span></button></li>';
         }).join('') + '</ul>';
-      listEl.appendChild(div);
+      cols.appendChild(div);
     });
 
   filter.addEventListener('input', function () {
@@ -67,11 +70,11 @@
   toList.addEventListener('click', function () { go('list'); });
   document.querySelectorAll('.map-all').forEach(function (b) { b.addEventListener('click', function () { go('list'); }); });
 
-  // Fade the list's sides only where there is more to scroll to
+  // Fade the list's top and bottom only where there is more to scroll to
   function edges() {
-    var x = listEl.scrollLeft, max = listEl.scrollWidth - listEl.clientWidth;
-    listEl.classList.toggle('more-left', x > 2);
-    listEl.classList.toggle('more-right', x < max - 2);
+    var y = listEl.scrollTop, max = listEl.scrollHeight - listEl.clientHeight;
+    listEl.classList.toggle('more-up', y > 2);
+    listEl.classList.toggle('more-down', y < max - 2);
   }
   listEl.addEventListener('scroll', edges, { passive: true });
   window.addEventListener('resize', edges);

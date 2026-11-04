@@ -285,10 +285,41 @@
       if (refitAfterZoom) { refitAfterZoom = false; refit(); }
     });
   // Scroll or pinch over the map to zoom (as on a Mac trackpad); a sideways swipe pans
+  // On a page that scrolls normally (data-wheel="modifier"), a plain scroll moves the page:
+  // pinch or hold ⌘/Ctrl to zoom, and on touch one finger scrolls while two move the map.
+  var modifierWheel = svg.attr('data-wheel') === 'modifier';
+  var hintEl = document.querySelector('.map-hint'), hintTimer;
+  function hint(text) {
+    if (!hintEl) return;
+    hintEl.textContent = text;
+    hintEl.classList.add('on');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(function () { hintEl.classList.remove('on'); }, 1400);
+  }
+  // Only hint when someone is clearly aiming at the map (resting on it), not scrolling past it
+  var overSince = 0, lastPageScroll = 0;
+  svg.on('pointerenter.hint', function () { overSince = Date.now(); });
+  window.addEventListener('scroll', function () { lastPageScroll = Date.now(); }, { passive: true });
+  function deliberate() { var t = Date.now(); return t - overSince > 900 && t - lastPageScroll > 900; }
   zoom.filter(function (e) {
-    if (e.type === 'wheel') return e.ctrlKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    if (e.type === 'wheel') {
+      if (modifierWheel) {
+        if (e.ctrlKey || e.metaKey) return true;
+        if (deliberate() && Math.abs(e.deltaY) > Math.abs(e.deltaX) && Math.abs(e.deltaY) > 4) hint(/Mac/.test(navigator.platform) ? 'Pinch or hold \u2318 while scrolling to zoom' : 'Hold Ctrl while scrolling to zoom');
+        return false;
+      }
+      return e.ctrlKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    }
+    if (modifierWheel && e.type === 'touchstart') return e.touches.length > 1;
     return !e.ctrlKey && !e.button;
   });
+  if (modifierWheel) {
+    var oneFinger = null;
+    svg.on('touchstart.hint', function (e) { oneFinger = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true })
+       .on('touchmove.hint', function (e) {
+         if (oneFinger != null && e.touches.length === 1 && Math.abs(e.touches[0].clientY - oneFinger) > 24) { hint('Use two fingers to move the map'); oneFinger = null; }
+       }, { passive: true });
+  }
   svg.call(zoom).on('dblclick.zoom', null);
   svg.on('wheel.pan', function (e) {
     if (e.ctrlKey || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
