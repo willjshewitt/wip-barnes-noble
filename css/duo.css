@@ -94,14 +94,6 @@ body.natural.slide { height: auto; overflow: visible; display: block; }
 .duo[data-focus="issue"][data-lean="tote"] .card-tote  { --s: .81; --hr: -3deg; opacity: .85; }
 .duo[data-focus="tote"][data-lean="issue"] .card-cover { --s: .81; --hr: 3deg; opacity: .85; }
 
-/* Arriving on this screen: the pair is dealt in from below */
-.duo-page:not(.at-issue) .card-cover { --y: 30dvh; --r: -16deg; opacity: 0; }
-.duo-page:not(.at-issue) .card-tote  { --y: 34dvh; --r: 16deg; opacity: 0; }
-.duo-page.at-issue .card { transition-delay: .3s; }
-.duo-page.at-issue .card-tote { transition-delay: .42s; }
-.duo-page.at-issue .duo:not([data-focus="none"]) .card,
-.duo-page.at-issue .duo[data-lean] .card { transition-delay: 0s; }
-
 /* The badge only turns up when the photo is picked */
 .card-tote .badge {
   position: absolute; z-index: 2; width: 104px; height: 104px; top: -38px; right: -38px;
