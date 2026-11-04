@@ -58,6 +58,7 @@
   var clusterLayer = g.append('g').attr('class', 'clusters');
   labelLayer = g.append('g').attr('class', 'labels').attr('aria-hidden', 'true');
   var resultIds = {}; // stores in the current result list are never grouped
+  var openIds = {}, openK = 0; // stores in a group you clicked open
 
   // Group stores that sit close together on screen into one counted circle.
   // Recomputed as you zoom, so groups split apart as you get closer.
@@ -71,7 +72,9 @@
     groupLevel = zoomLevel(k);
     var kq = Math.pow(2, groupLevel / 2);
     var r = CLUSTER_PX / kq, cells = {}, groups = [], taken = {};
-    var pts = mapped.filter(function (s) { return !resultIds[s.id]; });
+    // A group you've clicked stays open (its stores shown one by one) until you zoom back out
+    if (openK && k < openK * 0.8) { openIds = {}; openK = 0; }
+    var pts = mapped.filter(function (s) { return !resultIds[s.id] && !openIds[s.id]; });
     pts.forEach(function (s) {
       var key = Math.floor(s.x / r) + ',' + Math.floor(s.y / r);
       (cells[key] = cells[key] || []).push(s);
@@ -157,8 +160,12 @@
       var spread = d3.max(pts, function (p) { return Math.hypot(p[0] - d.x, p[1] - d.y); });
       // Stores sharing a spot can't be split by zooming: list them instead
       if (spread * k < 2 || k >= 13) { showNear(d.members[0], d.members[0].c + ', ' + d.members[0].s); return; }
+      // One click goes straight to the stores: zoom to fit them and show each one
       lastView = null;
-      zoomTo(pts, { minSpan: 6, maxK: 14 });
+      openIds = {};
+      d.members.forEach(function (o) { openIds[o.id] = true; });
+      openK = zoomTo(pts, { minSpan: 6, maxK: 14 });
+      groupLevel = null; // regroup when it lands, even at the same zoom step
     });
 
   // Fit the map to its box, edge to edge, and refit when the box changes size
@@ -359,6 +366,7 @@
     var t = d3.zoomIdentity.translate(cx, cy).scale(s).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
     if (opts.instant) svg.call(zoom.transform, t);
     else svg.transition().duration(reduceMotion() ? 0 : 750).call(zoom.transform, t);
+    return s;
   }
   function resetZoom() { svg.transition().duration(reduceMotion() ? 0 : 600).call(zoom.transform, d3.zoomIdentity); }
   function reduceMotion() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -430,6 +438,7 @@
     var ids = {};
     list.forEach(function (r) { ids[r.s.id] = true; });
     resultIds = ids;
+    openIds = {}; openK = 0;
     // Results always mean zooming in: step the headline back now, together with the
     // results row appearing, so the map's box only changes once
     if (list.length) document.body.classList.add('zoomed');
